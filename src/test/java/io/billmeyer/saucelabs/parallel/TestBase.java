@@ -1,6 +1,7 @@
 package io.billmeyer.saucelabs.parallel;
 
 import io.appium.java_client.android.AndroidDriver;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -27,7 +28,11 @@ import java.util.Date;
  */
 public class TestBase
 {
+    protected static final boolean realDeviceTesting = false;
+
     protected static final String testobjectApiKey = System.getenv("TESTOBJECT_API_KEY");
+    protected static final String userName = System.getenv("SAUCE_USERNAME");
+    protected static final String accessKey = System.getenv("SAUCE_ACCESS_KEY");
 
     /**
      * ThreadLocal variable which contains the  {@link WebDriver} instance which is used to perform browser interactions with.
@@ -49,11 +54,22 @@ public class TestBase
          */
 
         // @formatter:off
-        return new Object[][]{
-                new Object[]{"Android", "Samsung Galaxy S6", "6"},
-                new Object[]{"Android", "Google Pixel", "7"},
-                new Object[]{"Android", "Google Pixel 2 XL", "8.0.0"}
-        };
+        if (realDeviceTesting == true)
+        {
+            return new Object[][]{
+                    new Object[]{"Android", "Samsung Galaxy S6", "6"},
+                    new Object[]{"Android", "Google Pixel", "7"},
+                    new Object[]{"Android", "Google Pixel 2 XL", "8.0.0"}
+            };
+        }
+        else
+        {
+            return new Object[][]{
+                    new Object[]{"Android", "Android GoogleAPI Emulator", "7.1"},
+                    new Object[]{"Android", "Android GoogleAPI Emulator", "7"},
+                    new Object[]{"Android", "Android GoogleAPI Emulator", "6"}
+            };
+        }
         // @formatter:on
     }
 
@@ -83,18 +99,28 @@ public class TestBase
     protected AndroidDriver createDriver(String platformName, String platformVersion, String deviceName, String methodName)
     throws MalformedURLException
     {
+        URL url = null;
         DesiredCapabilities caps = new DesiredCapabilities();
 
         // set desired capabilities to launch appropriate platformName on Sauce
+        // For real device testing, connect to one URL using a certain set of credentials...
+        if (realDeviceTesting == true)
+        {
+            url = new URL("http://us1.appium.testobject.com/wd/hub");
+            caps.setCapability("testobject_api_key", testobjectApiKey);
+        }
+        // For emulator/simulator testing, connect to a different URL using a different certain set of credentials...
+        else
+        {
+            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.saucelabs.com:443/wd/hub");
+            caps.setCapability("app", "https://raw.githubusercontent.com/billmeyer/LoanCalcAppiumTest/master/app-release.apk");
+        }
 
-        caps.setCapability("testobject_api_key", testobjectApiKey);
         caps.setCapability("platformName", platformName);
         caps.setCapability("platformVersion", platformVersion);
         caps.setCapability("deviceName", deviceName);
         caps.setCapability("name", String.format("%s - %s %s [%s]", methodName, platformName, platformVersion, new Date()));
         caps.setCapability("appiumVersion", "1.6.5");
-
-        URL url = new URL("http://us1.appium.testobject.com/wd/hub");
 
         // Launch the remote platformName and set it as the current thread
         AndroidDriver driver = new AndroidDriver(url, caps);
@@ -116,15 +142,23 @@ public class TestBase
         String sessionId = driver.getSessionId().toString();
         boolean success = result.isSuccess();
 
-        reportTestResult(sessionId, success);
+        if (realDeviceTesting == false)
+        {
+            driver.executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
+        }
+        else
+        {
+            reportTestResult(sessionId, success);
+        }
         driver.quit();
     }
 
     /**
      * Uses the Appium V2 RESTful API to report test result status to the Sauce Labs dashboard.
+     *
+     * @param sessionId The session ID we want to set the status for
+     * @param status    TRUE if the test was successful, FALSE otherwise
      * @see https://api.testobject.com/#!/Appium_Watcher_API/updateTest
-     * @param sessionId
-     * @param status
      */
     public void reportTestResult(String sessionId, boolean status)
     {
