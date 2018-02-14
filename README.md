@@ -1,4 +1,4 @@
-## MultiJavaSauce
+## LoanCalcAppiumTest
 
 Demonstrates running Appium tests with the TestNG testing framework on Sauce Labs across multiple mobile device combinations in parallel.
 
