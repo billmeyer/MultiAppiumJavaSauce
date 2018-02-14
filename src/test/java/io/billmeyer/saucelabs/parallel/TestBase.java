@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * Simple TestNG test which demonstrates being instantiated via a DataProvider in order to supply multiple browser combinations.
  *
- * @author Neil Manvar
+ * @author Bill Meyer
  */
 public class TestBase
 {
