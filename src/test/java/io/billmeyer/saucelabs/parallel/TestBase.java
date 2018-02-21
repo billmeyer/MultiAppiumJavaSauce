@@ -59,7 +59,7 @@ public class TestBase
             return new Object[][]{
                     new Object[]{"Android", "Samsung Galaxy S6", "6"},
                     new Object[]{"Android", "Google Pixel", "7"},
-                    new Object[]{"Android", "Google Pixel 2 XL", "8.0.0"}
+                    new Object[]{"Android", "Google Pixel 2 XL", "8.1"}
             };
         }
         else
@@ -120,7 +120,7 @@ public class TestBase
         caps.setCapability("platformVersion", platformVersion);
         caps.setCapability("deviceName", deviceName);
         caps.setCapability("name", String.format("%s - %s %s [%s]", methodName, platformName, platformVersion, new Date()));
-        caps.setCapability("appiumVersion", "1.6.5");
+        caps.setCapability("appiumVersion", "1.7.2");
 
         // Launch the remote platformName and set it as the current thread
         AndroidDriver driver = new AndroidDriver(url, caps);
