@@ -60,7 +60,8 @@ public class TestBase
                     new Object[]{"Android", "LG Nexus 5X", "8.1"},
 //                    new Object[]{"Android", "LG G6", "7"},
                     new Object[]{"Android", "Samsung Galaxy S6", "6.0.1"},
-                    new Object[]{"Android", "Samsung Galaxy S9", "8.0"},
+//                    new Object[]{"Android", "Samsung Galaxy S9", "8.0"},
+                    new Object[]{"Android", "Samsung Note 5", "7.0"},
 //                    new Object[]{"Android", "Google Pixel", "7"},
 //                    new Object[]{"Android", "Google Pixel 2 XL", "8.1"}
             };
