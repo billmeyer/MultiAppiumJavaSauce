@@ -28,7 +28,7 @@ import java.util.Date;
  */
 public class TestBase
 {
-    protected static final boolean realDeviceTesting = false;
+    protected static final boolean realDeviceTesting = true;
 
     protected static final String testobjectApiKey = System.getenv("TESTOBJECT_API_KEY");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
@@ -57,7 +57,7 @@ public class TestBase
         if (realDeviceTesting == true)
         {
             return new Object[][]{
-                    new Object[]{"Android", "Samsung Galaxy S6", "6"},
+                    new Object[]{"Android", "LG G6", "7"},
                     new Object[]{"Android", "Google Pixel", "7"},
                     new Object[]{"Android", "Google Pixel 2 XL", "8.1"}
             };
