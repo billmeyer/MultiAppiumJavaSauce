@@ -1,7 +1,7 @@
 package io.billmeyer.saucelabs.parallel;
 
 import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.JavascriptExecutor;
+import io.appium.java_client.android.Connection;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -30,7 +30,7 @@ public class TestBase
 {
     protected static final boolean realDeviceTesting = true;
 
-    protected static final String testobjectApiKey = System.getenv("TESTOBJECT_API_KEY");
+    protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
     protected static final String accessKey = System.getenv("SAUCE_ACCESS_KEY");
 
@@ -57,11 +57,11 @@ public class TestBase
         if (realDeviceTesting == true)
         {
             return new Object[][]{
-                    new Object[]{"Android", "LG Nexus 5X", "8.1"},
-//                    new Object[]{"Android", "LG G6", "7"},
-                    new Object[]{"Android", "Samsung Galaxy S6", "6.0.1"},
+//                    new Object[]{"Android", "LG Nexus 5X", "8.1"},
+                    new Object[]{"Android", "LG G6", "7"}
+//                    new Object[]{"Android", "Samsung Galaxy S6", "6.0.1"}
 //                    new Object[]{"Android", "Samsung Galaxy S9", "8.0"},
-                    new Object[]{"Android", "Samsung Note 5", "7.0"},
+//                    new Object[]{"Android", "Samsung Note 5", "7.0"},
 //                    new Object[]{"Android", "Google Pixel", "7"},
 //                    new Object[]{"Android", "Google Pixel 2 XL", "8.1"}
             };
@@ -69,9 +69,10 @@ public class TestBase
         else
         {
             return new Object[][]{
-                    new Object[]{"Android", "Android GoogleAPI Emulator", "7.1"},
-                    new Object[]{"Android", "Android GoogleAPI Emulator", "7"},
-                    new Object[]{"Android", "Android GoogleAPI Emulator", "6"}
+//                    new Object[]{"Android", "Android GoogleAPI Emulator", "7.1"},
+//                    new Object[]{"Android", "Android GoogleAPI Emulator", "7"},
+//                    new Object[]{"Android", "Android GoogleAPI Emulator", "6"}
+                    new Object[]{"Android", "Google Nexus 6P", "8.1"}
             };
         }
         // @formatter:on
@@ -116,18 +117,36 @@ public class TestBase
         // For emulator/simulator testing, connect to a different URL using a different certain set of credentials...
         else
         {
-            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.saucelabs.com:443/wd/hub");
+            url = new URL("http://localhost:4723/wd/hub");
+//            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.saucelabs.com:443/wd/hub");
             caps.setCapability("app", "https://raw.githubusercontent.com/billmeyer/LoanCalcAppiumTest/master/app-release.apk");
+            caps.setCapability("automationName", "uiautomator2");
         }
 
         caps.setCapability("platformName", platformName);
         caps.setCapability("platformVersion", platformVersion);
         caps.setCapability("deviceName", deviceName);
         caps.setCapability("name", String.format("%s - %s %s [%s]", methodName, platformName, platformVersion, new Date()));
-        caps.setCapability("appiumVersion", "1.7.2");
+//        caps.setCapability("appiumVersion", "1.8.0");
 
         // Launch the remote platformName and set it as the current thread
         AndroidDriver driver = new AndroidDriver(url, caps);
+
+        // turn on all (data and wi-fi)
+//        driver.setConnection(Connection.ALL);
+
+        // turn off all (data and wi-fi)
+//        driver.setConnection(Connection.NONE);
+
+        // turn on airplane
+//        driver.setConnection(Connection.AIRPLANE);
+
+        // turn on data
+//        driver.setConnection(Connection.DATA);
+
+        // turn on wi-fi
+//        driver.setConnection(Connection.WIFI);
+
         androidDriverThreadLocal.set(driver);
 
         return androidDriverThreadLocal.get();
@@ -146,11 +165,7 @@ public class TestBase
         String sessionId = driver.getSessionId().toString();
         boolean success = result.isSuccess();
 
-        if (realDeviceTesting == false)
-        {
-            driver.executeScript("sauce:job-result=" + (result.isSuccess() ? "passed" : "failed"));
-        }
-        else
+        if (realDeviceTesting == true)
         {
             reportTestResult(sessionId, success);
         }
