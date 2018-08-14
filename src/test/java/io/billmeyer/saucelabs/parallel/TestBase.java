@@ -58,12 +58,12 @@ public class TestBase
         {
             return new Object[][]{
 //                    new Object[]{"Android", "LG Nexus 5X", "8.1"},
-                    new Object[]{"Android", "LG G6", "7"}
-//                    new Object[]{"Android", "Samsung Galaxy S6", "6.0.1"}
+                    new Object[]{"Android", "LG G6", "7"},
+                    new Object[]{"Android", "Samsung Galaxy S6", "6"},
 //                    new Object[]{"Android", "Samsung Galaxy S9", "8.0"},
 //                    new Object[]{"Android", "Samsung Note 5", "7.0"},
 //                    new Object[]{"Android", "Google Pixel", "7"},
-//                    new Object[]{"Android", "Google Pixel 2 XL", "8.1"}
+                    new Object[]{"Android", "Google Pixel 2 XL", "9"}
             };
         }
         else
@@ -117,8 +117,8 @@ public class TestBase
         // For emulator/simulator testing, connect to a different URL using a different certain set of credentials...
         else
         {
-            url = new URL("http://localhost:4723/wd/hub");
-//            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.saucelabs.com:443/wd/hub");
+//            url = new URL("http://localhost:4723/wd/hub");
+            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.saucelabs.com:443/wd/hub");
             caps.setCapability("app", "https://raw.githubusercontent.com/billmeyer/LoanCalcAppiumTest/master/app-release.apk");
             caps.setCapability("automationName", "uiautomator2");
         }
@@ -131,21 +131,6 @@ public class TestBase
 
         // Launch the remote platformName and set it as the current thread
         AndroidDriver driver = new AndroidDriver(url, caps);
-
-        // turn on all (data and wi-fi)
-//        driver.setConnection(Connection.ALL);
-
-        // turn off all (data and wi-fi)
-//        driver.setConnection(Connection.NONE);
-
-        // turn on airplane
-//        driver.setConnection(Connection.AIRPLANE);
-
-        // turn on data
-//        driver.setConnection(Connection.DATA);
-
-        // turn on wi-fi
-//        driver.setConnection(Connection.WIFI);
 
         androidDriverThreadLocal.set(driver);
 

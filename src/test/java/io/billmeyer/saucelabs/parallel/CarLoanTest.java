@@ -1,12 +1,10 @@
 package io.billmeyer.saucelabs.parallel;
 
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.pagefactory.AppiumFieldDecorator;
+import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -14,37 +12,9 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.util.concurrent.TimeUnit;
 
 public class CarLoanTest extends TestBase
 {
-    @FindBy(id = "io.billmeyer.loancalc:id/etLoanAmount")
-    MobileElement etLoanAmount;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/etEditInterest")
-    MobileElement etEditInterest;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/etSalesTax")
-    MobileElement etSalesTax;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/etTerm")
-    MobileElement etTerm;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/etDownPayment")
-    MobileElement etDownPayment;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/etTradeIn")
-    MobileElement etTradeIn;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/etFees")
-    MobileElement etFees;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/btnCalculate")
-    MobileElement btnCalculate;
-
-    @FindBy(id = "io.billmeyer.loancalc:id/tvLoanTotal")
-    MobileElement tvLoanTotal;
-
     /**
      * Runs a simple test verifying if the comment input is functional.
      *
@@ -57,8 +27,15 @@ public class CarLoanTest extends TestBase
 
         AndroidDriver driver = createDriver(platformName, platformVersion, deviceName, method.getName());
 
-        // Initialize our MobileElement variable bindings...
-        PageFactory.initElements(new AppiumFieldDecorator(driver, 5, TimeUnit.SECONDS), this);
+        WebElement etLoanAmount = driver.findElement(By.id("io.billmeyer.loancalc:id/etLoanAmount"));
+        WebElement etEditInterest = driver.findElement(By.id("io.billmeyer.loancalc:id/etEditInterest"));
+        WebElement etSalesTax = driver.findElement(By.id("io.billmeyer.loancalc:id/etSalesTax"));
+        WebElement etTerm = driver.findElement(By.id("io.billmeyer.loancalc:id/etTerm"));
+        WebElement etDownPayment = driver.findElement(By.id("io.billmeyer.loancalc:id/etDownPayment"));
+        WebElement etTradeIn = driver.findElement(By.id("io.billmeyer.loancalc:id/etTradeIn"));
+        WebElement etFees = driver.findElement(By.id("io.billmeyer.loancalc:id/etFees"));
+        WebElement btnCalculate = driver.findElement(By.id("io.billmeyer.loancalc:id/btnCalculate"));
+        WebElement tvLoanTotal = driver.findElement(By.id("io.billmeyer.loancalc:id/tvLoanTotal"));
 
         // Set the input values for our loan calculation...
         etLoanAmount.sendKeys("25000");
