@@ -1,7 +1,6 @@
 package io.billmeyer.saucelabs.parallel;
 
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.Connection;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -28,7 +27,7 @@ import java.util.Date;
  */
 public class TestBase
 {
-    protected static final boolean realDeviceTesting = true;
+    protected static final boolean realDeviceTesting = false;
 
     protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
@@ -57,22 +56,18 @@ public class TestBase
         if (realDeviceTesting == true)
         {
             return new Object[][]{
-//                    new Object[]{"Android", "LG Nexus 5X", "8.1"},
                     new Object[]{"Android", "LG G6", "7"},
                     new Object[]{"Android", "Samsung Galaxy S6", "6"},
-//                    new Object[]{"Android", "Samsung Galaxy S9", "8.0"},
-//                    new Object[]{"Android", "Samsung Note 5", "7.0"},
-//                    new Object[]{"Android", "Google Pixel", "7"},
                     new Object[]{"Android", "Google Pixel 2 XL", "9"}
             };
         }
         else
         {
             return new Object[][]{
-//                    new Object[]{"Android", "Android GoogleAPI Emulator", "7.1"},
+                    new Object[]{"Android", "Android GoogleAPI Emulator", "9.0"},
 //                    new Object[]{"Android", "Android GoogleAPI Emulator", "7"},
 //                    new Object[]{"Android", "Android GoogleAPI Emulator", "6"}
-                    new Object[]{"Android", "Google Nexus 6P", "8.1"}
+                    new Object[]{"Android", "Google Pixel 3 XL GoogleAPI Emulator", "9.0"}
             };
         }
         // @formatter:on
@@ -113,13 +108,15 @@ public class TestBase
         {
             url = new URL("http://us1.appium.testobject.com/wd/hub");
             caps.setCapability("testobject_api_key", testobjectApiKey);
+            caps.setCapability("recordDeviceVitals", true);
         }
         // For emulator/simulator testing, connect to a different URL using a different certain set of credentials...
         else
         {
 //            url = new URL("http://localhost:4723/wd/hub");
             url = new URL("https://" + userName + ":" + accessKey + "@ondemand.saucelabs.com:443/wd/hub");
-            caps.setCapability("app", "https://raw.githubusercontent.com/billmeyer/LoanCalcAppiumTest/master/app-release.apk");
+//            caps.setCapability("app", "https://raw.githubusercontent.com/billmeyer/LoanCalcAppiumTest/master/app-release.apk");
+            caps.setCapability("app", "sauce-storage:LoanCalc.apk");
             caps.setCapability("automationName", "uiautomator2");
         }
 
