@@ -27,7 +27,7 @@ import java.util.Date;
  */
 public class TestBase
 {
-    protected static final boolean realDeviceTesting = false;
+    protected static final boolean realDeviceTesting = true;
 
     protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
@@ -57,8 +57,8 @@ public class TestBase
         {
             return new Object[][]{
                     new Object[]{"Android", "LG G6", "7"},
-                    new Object[]{"Android", "Samsung Galaxy S6", "6"},
-                    new Object[]{"Android", "Google Pixel 2 XL", "9"}
+                    new Object[]{"Android", "Samsung Galaxy S6", "7"},
+                    new Object[]{"Android", "Google Pixel 2 XL", "10"}
             };
         }
         else
@@ -144,14 +144,17 @@ public class TestBase
     {
         AndroidDriver driver = androidDriverThreadLocal.get();
 
-        String sessionId = driver.getSessionId().toString();
-        boolean success = result.isSuccess();
-
-        if (realDeviceTesting == true)
+        if (driver != null)
         {
-            reportTestResult(sessionId, success);
+            String sessionId = driver.getSessionId().toString();
+            boolean success = result.isSuccess();
+
+            if (realDeviceTesting == true)
+            {
+                reportTestResult(sessionId, success);
+            }
+            driver.quit();
         }
-        driver.quit();
     }
 
     /**
