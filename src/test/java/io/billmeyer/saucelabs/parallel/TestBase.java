@@ -45,7 +45,7 @@ import java.util.Date;
 public class TestBase
 {
     protected static final boolean realDeviceTesting = true;
-    protected static final boolean unifiedPlatformTesting = false;
+    protected static final boolean unifiedPlatformTesting = true;
 
     protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
