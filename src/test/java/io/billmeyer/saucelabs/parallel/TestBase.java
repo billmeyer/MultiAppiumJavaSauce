@@ -1,8 +1,22 @@
 package io.billmeyer.saucelabs.parallel;
 
+
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
@@ -15,6 +29,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +45,7 @@ import java.util.Date;
 public class TestBase
 {
     protected static final boolean realDeviceTesting = true;
-    protected static final boolean unifiedPlatformTesting = true;
+    protected static final boolean unifiedPlatformTesting = false;
 
     protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
@@ -38,7 +54,7 @@ public class TestBase
     /**
      * ThreadLocal variable which contains the  {@link WebDriver} instance which is used to perform browser interactions with.
      */
-    private ThreadLocal<AndroidDriver> androidDriverThreadLocal = new ThreadLocal<AndroidDriver>();
+    private ThreadLocal<AndroidDriver> androidDriverThreadLocal = new ThreadLocal<>();
 
     /**
      * DataProvider that explicitly sets the browser combinations to be used.
@@ -120,18 +136,25 @@ public class TestBase
         // For emulator/simulator testing, connect to a different URL using a different certain set of credentials...
         else
         {
-            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.us-west-1.saucelabs.com:443/wd/hub");
-            caps.setCapability("app", "sauce-storage:LoanCalc.apk");
+            url = new URL("https://" + userName + ":" + accessKey + "@ondemand.us-west-1.saucelabs.com/wd/hub");
+//            caps.setCapability("app", "sauce-storage:LoanCalc.apk");
+            caps.setCapability("app", "sauce-storage:app-release.apk");
             caps.setCapability("automationName", "uiautomator2");
         }
 
+//        caps.setCapability("appiumVersion", "1.14.0");
         caps.setCapability("platformName", platformName);
         caps.setCapability("platformVersion", platformVersion);
         caps.setCapability("deviceName", deviceName);
-        caps.setCapability("name", String.format("%s - %s %s [%s]", methodName, platformName, platformVersion, new Date()));
+//        caps.setCapability("name", String.format("%s - %s %s [%s]", methodName, platformName, platformVersion, new Date()));
+        caps.setCapability("name", methodName);
 
         // Launch the remote platformName and set it as the current thread
+
+        long start = System.currentTimeMillis();
         AndroidDriver driver = new AndroidDriver(url, caps);
+        long stop = System.currentTimeMillis();
+        System.err.printf("AndroidDriver creation took %d secs\n", (stop - start) / 1000);
 
         androidDriverThreadLocal.set(driver);
 
@@ -146,7 +169,7 @@ public class TestBase
     public void tearDown(ITestResult result)
     throws Exception
     {
-        AndroidDriver driver = androidDriverThreadLocal.get();
+        AppiumDriver driver = androidDriverThreadLocal.get();
 
         if (driver != null)
         {
@@ -164,6 +187,35 @@ public class TestBase
                 }
             }
             driver.quit();
+        }
+    }
+
+    public static void pushToSauceStorage(String localFileName, String remoteFileName)
+    {
+        File file = new File("/Users/bmeyer/github/billmeyer/LoanCalcAppiumTest/app-release.apk");
+
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(userName, accessKey);
+        credsProvider.setCredentials(AuthScope.ANY, credentials);
+
+        HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credsProvider).build();
+
+        HttpPost postRequest = new HttpPost("https://api.us-west-1.saucelabs.com/v1/rdc/apps/upload");
+        String fileName = file.getName();
+        FileBody fileBody = new FileBody(file);
+
+        HttpEntity httpEntity = MultipartEntityBuilder.create().addPart("fileName", new StringBody(fileName, ContentType.APPLICATION_OCTET_STREAM)).addPart("attachment", fileBody).build();
+
+        postRequest.setEntity(httpEntity);
+        try
+        {
+            HttpResponse response = client.execute(postRequest);
+            StatusLine sl = response.getStatusLine();
+            System.out.printf("HTTP Response: %d, %s\n", sl.getStatusCode(), sl.getReasonPhrase());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -192,8 +244,8 @@ public class TestBase
     /**
      * Uses the Appium V2 RESTful API to report test result status to the Sauce Labs dashboard.
      *
-     * @param driver    The WebDriver instance we'll use to get the session ID we want to set the status for
-     * @param status    TRUE if the test was successful, FALSE otherwise
+     * @param driver The WebDriver instance we'll use to get the session ID we want to set the status for
+     * @param status TRUE if the test was successful, FALSE otherwise
      * @see https://api.testobject.com/#!/Appium_Watcher_API/updateTest
      */
     public void reportTestResult(RemoteWebDriver driver, boolean status)

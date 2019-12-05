@@ -1,5 +1,7 @@
 package io.billmeyer.saucelabs.parallel;
 
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
@@ -24,6 +26,8 @@ public class CarLoanTest extends TestBase
     public void calculateCarLoan(String platformName, String deviceName, String platformVersion, Method method)
     throws MalformedURLException
     {
+
+//        pushToSauceStorage("", "");
 
         AndroidDriver driver = createDriver(platformName, platformVersion, deviceName, method.getName());
 
