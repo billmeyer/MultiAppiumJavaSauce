@@ -79,9 +79,9 @@ public class TestBase
                 };
             else
                 return new Object[][]{
-                    new Object[]{"Android", "LG G6", "7"},
-                    new Object[]{"Android", "Samsung Galaxy S6", "7"},
-                    new Object[]{"Android", "Google Pixel 2 XL", "10"}
+//                    new Object[]{"Android", "LG G6", "7"},
+                    new Object[]{"Android", "Samsung Galaxy S6", "7"}
+//                    new Object[]{"Android", "Google Pixel 2 XL", "10"}
                 };
         }
         else
