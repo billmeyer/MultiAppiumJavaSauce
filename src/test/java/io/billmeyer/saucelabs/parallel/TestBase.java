@@ -17,6 +17,8 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
@@ -35,7 +37,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
-import java.util.Date;
 
 /**
  * Simple TestNG test which demonstrates being instantiated via a DataProvider in order to supply multiple browser combinations.
@@ -154,7 +155,7 @@ public class TestBase
         long start = System.currentTimeMillis();
         AndroidDriver driver = new AndroidDriver(url, caps);
         long stop = System.currentTimeMillis();
-        System.err.printf("AndroidDriver creation took %d secs\n", (stop - start) / 1000);
+        info(driver, "Device allocation took %d secs\n", (stop - start) / 1000);
 
         androidDriverThreadLocal.set(driver);
 
@@ -183,7 +184,7 @@ public class TestBase
                 }
                 else
                 {
-                    reportTestResult(driver, success);
+                    reportTestObjectResult(driver, success);
                 }
             }
             driver.quit();
@@ -219,26 +220,20 @@ public class TestBase
         }
     }
 
+    /**
+     * Logs the given line in the job’s commands list. No spaces can be between sauce: and context.
+     */
+    public static void info(RemoteWebDriver driver, String format, Object... args)
+    {
+        System.out.printf(format, args);
+        return; // Not currently implemented
+//        String msg = String.format(format, args);
+//        ((JavascriptExecutor) driver).executeScript("sauce:context=" + msg);
+    }
+
     public static void reportSauceLabsMobileResult(RemoteWebDriver driver, boolean status)
     {
-        String sessionId = driver.getSessionId().toString();
-
-        // The Appium REST Api expects JSON payloads...
-        MediaType[] mediaType = new MediaType[]{MediaType.APPLICATION_JSON_TYPE};
-
-        // Construct the new REST client...
-        Client client = ClientBuilder.newClient();
-//        WebTarget resource = client.target("https://api.us-west-1.saucelabs.com/v1/rdc");
-        WebTarget resource = client.target("https://saucelabs.com/rest/v1");
-
-        // Construct the REST body payload...
-        Entity entity = Entity.json(Collections.singletonMap("passed", status));
-
-        // Build a PUT request to /v2/appium/session/{:sessionId}/test
-        Invocation.Builder request = resource.path(userName).path("jobs").path(sessionId).request(mediaType);
-
-        // Execute the PUT request...
-        request.put(entity);
+        ((JavascriptExecutor)driver).executeScript("sauce:job-result=" + (status ? "passed" : "false"));
     }
 
     /**
@@ -248,7 +243,7 @@ public class TestBase
      * @param status TRUE if the test was successful, FALSE otherwise
      * @see https://api.testobject.com/#!/Appium_Watcher_API/updateTest
      */
-    public void reportTestResult(RemoteWebDriver driver, boolean status)
+    public void reportTestObjectResult(RemoteWebDriver driver, boolean status)
     {
         String sessionId = driver.getSessionId().toString();
 
