@@ -48,7 +48,7 @@ import java.util.Date;
 public class TestBase
 {
     protected static final boolean realDeviceTesting = true;
-    protected static final boolean unifiedPlatformTesting = true;
+    protected static final boolean unifiedPlatformTesting = false;
 
     protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
@@ -78,11 +78,11 @@ public class TestBase
         {
             if (unifiedPlatformTesting == true)
                 return new Object[][] {
-                        new Object[]{"Android", "Samsung_Galaxy_S6_POC116", "7"}
+                        new Object[]{"Android", "Google_Pixel_3_POC150", "9"}
                 };
             else
                 return new Object[][]{
-                    new Object[]{"Android", "Samsung Galaxy S6", "7"}
+                    new Object[]{"Android", "Google_Pixel_3_POC150", "9"}
                 };
         }
         else
