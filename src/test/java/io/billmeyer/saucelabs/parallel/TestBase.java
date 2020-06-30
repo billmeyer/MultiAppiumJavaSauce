@@ -48,7 +48,8 @@ import java.util.Date;
 public class TestBase
 {
     protected static final boolean realDeviceTesting = true;
-    protected static final boolean unifiedPlatformTesting = false;
+    protected static final boolean unifiedPlatformTesting = true;
+    protected static final boolean publicDevices = true;
 
     protected static final String testobjectApiKey = System.getenv("TO_LOANCALC_APP");
     protected static final String userName = System.getenv("SAUCE_USERNAME");
@@ -77,19 +78,31 @@ public class TestBase
         if (realDeviceTesting == true)
         {
             if (unifiedPlatformTesting == true)
-                return new Object[][] {
-                        new Object[]{"Android", "Google_Pixel_3_POC150", "9"}
-                };
+                if (publicDevices == true)
+                {
+                    return new Object[][] {
+//                            new Object[]{"Android", "9", "Google.*"}
+                            new Object[]{"Android", "9", "LG.*"}
+//                            new Object[]{"Android", "7.0", "Samsung_Galaxy_S8_Plus_7_real_us"}
+//                            new Object[]{"Android", "9.0", "Google_Pixel_3_POC156"}
+                    };
+                }
+            else
+                {
+                    return new Object[][] {
+                            new Object[]{"Android", "9.0", "Google_Pixel_3_POC156"}
+                    };
+                }
             else
                 return new Object[][]{
-                    new Object[]{"Android", "Google_Pixel_3_POC150", "9"}
+                    new Object[]{"Android", "9.0", "Google_Pixel_3_POC150"}
                 };
         }
         else
         {
             return new Object[][]{
-                    new Object[]{"Android", "Android GoogleAPI Emulator", "9.0"},
-                    new Object[]{"Android", "Google Pixel 3 XL GoogleAPI Emulator", "9.0"}
+//                    new Object[]{"Android", "9.0", "Android GoogleAPI Emulator"},
+                    new Object[]{"Android", "8.1", "Samsung Galaxy S8 WQHD GoogleAPI Emulator"}
             };
         }
         // @formatter:on
@@ -140,6 +153,7 @@ public class TestBase
             caps.setCapability("automationName", "uiautomator2");
         }
 
+        caps.setCapability("appiumVersion", "1.17.0");
         caps.setCapability("platformName", platformName);
         caps.setCapability("platformVersion", platformVersion);
         caps.setCapability("deviceName", deviceName);
@@ -157,8 +171,10 @@ public class TestBase
         long stop = System.currentTimeMillis();
         info(driver, "Device allocation took %d secs\n", (stop - start) / 1000);
 
-        androidDriverThreadLocal.set(driver);
+        String reportUrl = (String) driver.getCapabilities().getCapability("testobject_test_report_url");
+        String sessionId = driver.getSessionId().toString();
 
+        androidDriverThreadLocal.set(driver);
         return androidDriverThreadLocal.get();
     }
 

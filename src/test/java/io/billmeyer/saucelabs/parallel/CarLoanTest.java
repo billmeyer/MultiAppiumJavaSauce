@@ -3,6 +3,7 @@ package io.billmeyer.saucelabs.parallel;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidElementStateException;
 import org.openqa.selenium.OutputType;
@@ -23,13 +24,10 @@ public class CarLoanTest extends TestBase
      * @throws InvalidElementStateException
      */
     @Test(dataProvider = "hardCodedDevices")
-    public void calculateCarLoan(String platformName, String deviceName, String platformVersion, Method method)
+    public void calculateCarLoan(String platformName, String platformVersion, String deviceName, Method method)
     throws MalformedURLException
     {
-
-//        pushToSauceStorage("", "");
-
-        AndroidDriver driver = createDriver(platformName, platformVersion, deviceName, method.getName());
+        AppiumDriver driver = createDriver(platformName, platformVersion, deviceName, method.getName());
 
         WebElement etLoanAmount = driver.findElement(By.id("io.billmeyer.loancalc:id/etLoanAmount"));
         WebElement etEditInterest = driver.findElement(By.id("io.billmeyer.loancalc:id/etEditInterest"));
